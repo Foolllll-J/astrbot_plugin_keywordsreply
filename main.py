@@ -83,7 +83,7 @@ class krPlugin(Star):
             replies_str = (
                 " | ".join(replies) if isinstance(replies, list) else str(replies)
             )
-            keyword_list.append(f"{i}. 关键词：{keyword}\n   回复：{replies_str}")
+            keyword_list.append(f"{i}. 关键词：{keyword}\n    回复：{replies_str}")
 
         result = "当前关键词回复规则：\n\n" + "\n\n".join(keyword_list)
         yield event.plain_result(result)
@@ -134,12 +134,13 @@ class krPlugin(Star):
     @filter.event_message_type(filter.EventMessageType.ALL)
     async def on_message(self, event: AstrMessageEvent):
         """监听所有消息，检测关键词并回复"""
+        
+        if event.is_at_or_wake_command:
+            return
+            
         message_str = event.message_str.strip()
 
         if not message_str or not self.keywords:
-            return
-
-        if message_str.startswith("/"):
             return
 
         if random.random() > self.reply_probability:
@@ -183,15 +184,15 @@ class krPlugin(Star):
     def _is_safe_regex(self, pattern: str) -> bool:
         """正则表达式安全检查"""
         dangerous_patterns = [
-            r'\(\?\:',  
-            r'\(\?\!', 
-            r'\(\?\<',  
-            r'\*\+',    
-            r'\+\*',    
-            r'\*\*',   
-            r'\+\+',   
-            r'\(\.*\+.*\)\+',  
-            r'\{.*\}.*\{.*\}', 
+            r'\(\?:',
+            r'\(\?!',
+            r'\(\?\<',
+            r'\*\+',
+            r'\+\*',
+            r'\*\*',
+            r'\+\+',
+            r'\(\.*\+.*\)\+',
+            r'\{.*\}.*\{.*\}',
         ]
         
         if len(pattern) > 100:
